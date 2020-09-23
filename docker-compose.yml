@@ -1,0 +1,28 @@
+version: '3'
+services:
+  app:
+    image: golang:1.15
+    container_name: pbi-auction
+    volumes:
+    - ./:/app
+    - ./cache/mod:/go/pkg/mod
+    - ./cache/go-build:/root/.cache/go-build
+    - ./ui/dist:/usr/share/pbi-auction/assets
+    working_dir: /app
+    ports:
+    - "8080:80"
+    command: [go, run, .]
+    env_file:
+    - dev.env
+    links:
+    - "redis:redis"
+  webpack:
+    image: node:12
+    container_name: pbi-auction_webpack
+    volumes:
+    - ./ui:/build
+    working_dir: /build
+    command: [npm, run, watch]
+  redis:
+    image: redis:6
+    container_name: pbi-auction_redis
